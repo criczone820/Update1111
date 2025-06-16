@@ -14,7 +14,9 @@ import {
   Trash2,
   Sparkles,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  User,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { tradingService } from '../services/tradingService';
@@ -23,12 +25,14 @@ import { calculateSessionStats, formatCurrency, formatPercentage } from '../util
 import { exportToJSON, exportToExcel, importFromJSON } from '../utils/exportUtils';
 import SessionCard from './Dashboard/SessionCard';
 import StatsCard from './Dashboard/StatsCard';
-import TradeForm from './Dashboard/TradeForm';
+import EnhancedTradeForm from './TradeExtraction/EnhancedTradeForm';
 import TradesList from './Dashboard/TradesList';
 import EnhancedPerformanceChart from './Dashboard/EnhancedPerformanceChart';
-import ChatInterface from './AI/ChatInterface';
+import EnhancedChatInterface from './AI/EnhancedChatInterface';
 import SessionSummaryModal from './Dashboard/SessionSummaryModal';
 import SydneyGreeting from './Dashboard/SydneyGreeting';
+import UserAnalyticsPage from './Analytics/UserAnalyticsPage';
+import MarketOverviewTab from './MarketOverview/MarketOverviewTab';
 import toast from 'react-hot-toast';
 
 const TradingDashboard: React.FC = () => {
@@ -54,6 +58,7 @@ const TradingDashboard: React.FC = () => {
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [extractedTradeData, setExtractedTradeData] = useState<any>(null);
   const [sessionsCollapsed, setSessionsCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'market'>('dashboard');
 
   useEffect(() => {
     if (user) {
@@ -302,6 +307,157 @@ const TradingDashboard: React.FC = () => {
     );
   }
 
+  // Render Analytics Page
+  if (activeTab === 'analytics') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Header */}
+        <header className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-blue-600 rounded-full p-2 mr-4">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">Laxmi Chit Fund</h1>
+                  <p className="text-slate-400 text-sm">Analytics Dashboard</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                {/* Navigation Tabs */}
+                <div className="flex items-center space-x-2 bg-slate-700 rounded-lg p-1">
+                  <button
+                    onClick={() => setActiveTab('dashboard')}
+                    className="px-4 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('analytics')}
+                    className="px-4 py-2 text-sm rounded-md transition-colors bg-blue-600 text-white"
+                  >
+                    <User className="w-4 h-4 mr-2 inline" />
+                    Analytics
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('market')}
+                    className="px-4 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white"
+                  >
+                    <Globe className="w-4 h-4 mr-2 inline" />
+                    Market
+                  </button>
+                </div>
+                
+                <span className="text-slate-300">Welcome, {userName}</span>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center px-4 py-2 text-slate-300 hover:text-white transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <UserAnalyticsPage />
+        
+        {/* Enhanced Chat Interface */}
+        <EnhancedChatInterface 
+          currentSessionId={currentSession?.id} 
+          onSessionSwitch={handleSessionSwitch}
+          onTradeDataExtracted={handleTradeDataExtracted}
+        />
+      </div>
+    );
+  }
+
+  // Render Market Overview
+  if (activeTab === 'market') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Header */}
+        <header className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-blue-600 rounded-full p-2 mr-4">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">Laxmi Chit Fund</h1>
+                  <p className="text-slate-400 text-sm">Market Overview</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                {/* Navigation Tabs */}
+                <div className="flex items-center space-x-2 bg-slate-700 rounded-lg p-1">
+                  <button
+                    onClick={() => setActiveTab('dashboard')}
+                    className="px-4 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('analytics')}
+                    className="px-4 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white"
+                  >
+                    <User className="w-4 h-4 mr-2 inline" />
+                    Analytics
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('market')}
+                    className="px-4 py-2 text-sm rounded-md transition-colors bg-blue-600 text-white"
+                  >
+                    <Globe className="w-4 h-4 mr-2 inline" />
+                    Market
+                  </button>
+                </div>
+                
+                <span className="text-slate-300">Welcome, {userName}</span>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center px-4 py-2 text-slate-300 hover:text-white transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <MarketOverviewTab />
+            </div>
+            <div>
+              {/* Additional market widgets can go here */}
+              <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <h3 className="text-lg font-semibold text-white mb-4">Market News</h3>
+                <p className="text-slate-400 text-sm">
+                  Real-time market news integration coming soon...
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Enhanced Chat Interface */}
+        <EnhancedChatInterface 
+          currentSessionId={currentSession?.id} 
+          onSessionSwitch={handleSessionSwitch}
+          onTradeDataExtracted={handleTradeDataExtracted}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
@@ -319,6 +475,30 @@ const TradingDashboard: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Navigation Tabs */}
+              <div className="flex items-center space-x-2 bg-slate-700 rounded-lg p-1">
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className="px-4 py-2 text-sm rounded-md transition-colors bg-blue-600 text-white"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => setActiveTab('analytics')}
+                  className="px-4 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white"
+                >
+                  <User className="w-4 h-4 mr-2 inline" />
+                  Analytics
+                </button>
+                <button
+                  onClick={() => setActiveTab('market')}
+                  className="px-4 py-2 text-sm rounded-md transition-colors text-slate-300 hover:text-white"
+                >
+                  <Globe className="w-4 h-4 mr-2 inline" />
+                  Market
+                </button>
+              </div>
+              
               <span className="text-slate-300">Welcome, {userName}</span>
               <button
                 onClick={handleSignOut}
@@ -543,12 +723,12 @@ const TradingDashboard: React.FC = () => {
 
                 {/* Trade Form and List */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <TradeForm
+                  <EnhancedTradeForm
                     onAddTrade={handleAddTrade}
                     sessionId={currentSession.id}
-                    extractedTradeData={extractedTradeData}
                   />
                   <div className="lg:col-span-1">
+                
                     <TradesList
                       trades={trades}
                       onDeleteTrade={handleDeleteTrade}
@@ -574,8 +754,8 @@ const TradingDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Chat Interface */}
-      <ChatInterface 
+      {/* Enhanced AI Chat Interface */}
+      <EnhancedChatInterface 
         currentSessionId={currentSession?.id} 
         onSessionSwitch={handleSessionSwitch}
         onTradeDataExtracted={handleTradeDataExtracted}
